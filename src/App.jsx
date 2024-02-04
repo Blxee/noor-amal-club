@@ -1,7 +1,9 @@
 import 'bootstrap/dist/css/bootstrap.min.css'
 import './App.css'
+import { Storage } from './storage';
 
 function App() {
+  new Storage();
   return (
     <div className='position-relative d-flex flex-column align-items-center'>
       <img className='w-25' src='/logo.png'/>
@@ -37,7 +39,7 @@ function App() {
         </tbody>
       </table>
 
-      {/* <h1 className='position-absolute top-50 start-50 translate-middle'>Hiiii</h1> */}
+      <h1 className='w-100 h-100 position-absolute top-50 start-50 translate-middle'>Hiiii</h1>
     </div>
   )
 }
