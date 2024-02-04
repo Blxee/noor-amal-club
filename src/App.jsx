@@ -4,7 +4,7 @@ import './App.css'
 function App() {
   return (
     <div className='position-relative d-flex flex-column align-items-center'>
-      <h1>Hello World</h1>
+      <img className='w-25' src='/logo.png'/>
       <table className='table table-striped'>
         <thead>
           <tr>
@@ -37,7 +37,7 @@ function App() {
         </tbody>
       </table>
 
-      <h1 className='position-absolute top-50 start-50 translate-middle'>Hiiii</h1>
+      {/* <h1 className='position-absolute top-50 start-50 translate-middle'>Hiiii</h1> */}
     </div>
   )
 }
