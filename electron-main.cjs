@@ -3,8 +3,48 @@ const { app, BrowserWindow } = require("electron");
 const path = require("path");
 const express = require("express");
 const cors = require("cors");
+const fs = require("fs");
+
 const localServerApp = express();
 const PORT = 8088;
+const dataPath = app.getPath('userData') + '/user-data.json';
+
+// create the data file if it does not exist
+if (!fs.existsSync(dataPath)) {
+  fs.writeFileSync(dataPath, '[]');
+}
+
+// if the data is corrupted, rest the file
+try {
+  const data = fs.readFileSync(dataPath);
+  JSON.parse(data);
+} catch {
+  fs.writeFileSync(dataPath, '[]');
+}
+
+const startDataAPI = () => {
+
+  localServerApp.get('/get-all/', (req, res) => {
+    let data = fs.readFileSync(dataPath);
+    res.send(data);
+  });
+
+  localServerApp.post('/add-user/', (req, res) => {
+    console.log(req.body)
+    try {
+      const newUser = JSON.parse(req.body);
+      let data = fs.readFileSync(dataPath);
+      data = JSON.parse(data);
+      data.push(newUser);
+      data = JSON.stringify(data);
+      fs.writeFileSync(dataPath, data);
+    } catch (error) {
+      console.log(error);
+      res.statusCode = 404;
+    }
+  });
+};
+
 const startLocalServer = (done) => {
   localServerApp.use(express.json({ limit: "100mb" }));
   localServerApp.use(cors());
@@ -37,6 +77,7 @@ function createWindow() {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
+  startDataAPI();
   startLocalServer(createWindow);
 
   app.on("activate", function () {
