@@ -6,6 +6,7 @@ const cors = require("cors");
 const fs = require("fs");
 
 const localServerApp = express();
+localServerApp.use(express.json())
 const PORT = 8088;
 const dataPath = app.getPath('userData') + '/user-data.json';
 
@@ -30,19 +31,45 @@ const startDataAPI = () => {
   });
 
   localServerApp.post('/add-user/', (req, res) => {
-    console.log(req.body)
     try {
-      const newUser = JSON.parse(req.body);
+      const newUser = req.body;
       let data = fs.readFileSync(dataPath);
       data = JSON.parse(data);
+      newUser.id = (data[data.length] || 0) + 1;
       data.push(newUser);
       data = JSON.stringify(data);
       fs.writeFileSync(dataPath, data);
+      res.status(200).send('User added successfully');
     } catch (error) {
       console.log(error);
-      res.statusCode = 404;
+      res.status(404).send('Failed to add user');
     }
+    res.end();
   });
+
+  localServerApp.put('/update-user/:userId', (req, res) => {
+  });
+
+  localServerApp.delete('/delete-user/:userId', (req, res) => {
+    try {
+      let data = fs.readFileSync(dataPath);
+      data = JSON.parse(data);
+      const idx = data.findIndex(({ id }) => id === req.params.userId);
+      if (idx === -1) {
+        res.status(404).send('No such user exists');
+        return;
+      }
+      const user = data.splice(idx, 1);
+      data = JSON.stringify(data);
+      fs.writeFileSync(dataPath, data);
+      res.status(200).send(JSON.stringify(user));
+    } catch (error) {
+      console.log(error);
+      res.status(404).send('Error: ' + error.message);
+    }
+    res.end();
+  });
+
 };
 
 const startLocalServer = (done) => {
