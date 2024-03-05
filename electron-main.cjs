@@ -35,7 +35,7 @@ const startDataAPI = () => {
       const newUser = req.body;
       let data = fs.readFileSync(dataPath);
       data = JSON.parse(data);
-      newUser.id = (data[data.length] || 0) + 1;
+      newUser.id = (data[data.length - 1]?.id || 0) + 1;
       data.push(newUser);
       data = JSON.stringify(data);
       fs.writeFileSync(dataPath, data);
@@ -48,13 +48,53 @@ const startDataAPI = () => {
   });
 
   localServerApp.put('/update-user/:userId', (req, res) => {
-  });
+     try {
+      const updatedUser = req.body;
+      let data = fs.readFileSync(dataPath);
+      data = JSON.parse(data);
+      const user = data.find(({ id }) => id === parseInt(req.params.userId));
+      if (user == undefined) {
+        res.status(404).send('No such user exists');
+        return;
+      }
+      Object.assign(user, updatedUser);
+      data = JSON.stringify(data);
+      fs.writeFileSync(dataPath, data);
+      res.status(200).send('User updated successfully');
+    } catch (error) {
+      console.log(error);
+      res.status(404).send('Error: ' + error.message);
+    }
+    res.end();
+ });
+
+  localServerApp.put('/pay-month/:userId', (req, res) => {
+     try {
+      let data = fs.readFileSync(dataPath);
+      data = JSON.parse(data);
+      const user = data.find(({ id }) => id === parseInt(req.params.userId));
+      if (user == undefined) {
+        res.status(404).send('No such user exists');
+        return;
+      }
+      let lastPaid = new Date(user.lastPaid);
+      lastPaid = new Date(lastPaid.setMonth(lastPaid.getMonth() + 1));
+      user.lastPaid = lastPaid;
+      data = JSON.stringify(data);
+      fs.writeFileSync(dataPath, data);
+      res.status(200).send('User payment updated successfully');
+    } catch (error) {
+      console.log(error);
+      res.status(404).send('Error: ' + error.message);
+    }
+    res.end();
+ });
 
   localServerApp.delete('/delete-user/:userId', (req, res) => {
     try {
       let data = fs.readFileSync(dataPath);
       data = JSON.parse(data);
-      const idx = data.findIndex(({ id }) => id === req.params.userId);
+      const idx = data.findIndex(({ id }) => id === parseInt(req.params.userId));
       if (idx === -1) {
         res.status(404).send('No such user exists');
         return;
