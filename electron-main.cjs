@@ -62,7 +62,7 @@ const startDataAPI = () => {
       res.status(200).send('User updated successfully');
     } catch (error) {
       console.log(error);
-      res.status(404).send('Error: ' + error.message);
+      res.status(404).send(error.message);
     }
     res.end();
  });
@@ -84,7 +84,7 @@ const startDataAPI = () => {
       res.status(200).send('User payment updated successfully');
     } catch (error) {
       console.log(error);
-      res.status(404).send('Error: ' + error.message);
+      res.status(404).send(error.message);
     }
     res.end();
  });
@@ -101,7 +101,7 @@ const startDataAPI = () => {
       const user = data.splice(idx, 1);
       data = JSON.stringify(data);
       fs.writeFileSync(dataPath, data);
-      res.status(200).send(JSON.stringify(user));
+      res.status(200).send('User deleted successfully');
     } catch (error) {
       console.log(error);
       res.status(404).send('Error: ' + error.message);

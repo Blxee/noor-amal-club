@@ -14,149 +14,16 @@ const belts = {
   black: '#000000',
 };
 
-const data = [
-  {
-    firstName: 'Superlek',
-    lastName: 'Kiatmoo3',
-    registration: new Date('2017-01-20'),
-    assurance: true,
-    lastPaid: new Date('2017-03-20'),
-    debt: 3,
-    belt: 'black',
-  },
-  {
-    firstName: 'blaaaaaa',
-    lastName: 'Kiatmoo3',
-    registration: new Date('2017-01-20'),
-    assurance: true,
-    debt: 0,
-    lastPaid: new Date('2017-03-20'),
-    belt: 'black',
-  },
-  {
-    firstName: 'blaaaaaa',
-    lastName: 'Kiatmoo3',
-    registration: new Date('2017-01-20'),
-    assurance: true,
-    debt: -2,
-    lastPaid: new Date('2017-03-20'),
-    belt: 'black',
-  },
-  {
-    firstName: 'blaaaaaa',
-    lastName: 'Kiatmoo3',
-    registration: new Date('2017-01-20'),
-    assurance: true,
-    lastPaid: new Date('2017-03-20'),
-    belt: 'black',
-  },
-  {
-    firstName: 'blaaaaaa',
-    lastName: 'Kiatmoo3',
-    registration: new Date('2017-01-20'),
-    assurance: true,
-    lastPaid: new Date('2017-03-20'),
-    belt: 'black',
-  },
-  {
-    firstName: 'blaaaaaa',
-    lastName: 'Kiatmoo3',
-    registration: new Date('2017-01-20'),
-    assurance: true,
-    lastPaid: new Date('2017-03-20'),
-    belt: 'black',
-  },
-  {
-    firstName: 'blaaaaaa',
-    lastName: 'Kiatmoo3',
-    registration: new Date('2017-01-20'),
-    assurance: true,
-    lastPaid: new Date('2017-03-20'),
-    belt: 'black',
-  },
-  {
-    firstName: 'blaaaaaa',
-    lastName: 'Kiatmoo3',
-    registration: new Date('2017-01-20'),
-    assurance: true,
-    lastPaid: new Date('2017-03-20'),
-    belt: 'black',
-  },
-  {
-    firstName: 'blaaaaaa',
-    lastName: 'Kiatmoo3',
-    registration: new Date('2017-01-20'),
-    assurance: true,
-    lastPaid: new Date('2017-03-20'),
-    belt: 'black',
-  },
-  {
-    firstName: 'blaaaaaa',
-    lastName: 'Kiatmoo3',
-    registration: new Date('2017-01-20'),
-    assurance: true,
-    lastPaid: new Date('2017-03-20'),
-    belt: 'black',
-  },
-  {
-    firstName: 'blaaaaaa',
-    lastName: 'Kiatmoo3',
-    registration: new Date('2017-01-20'),
-    assurance: true,
-    lastPaid: new Date('2017-03-20'),
-    belt: 'black',
-  },
-  {
-    firstName: 'blaaaaaa',
-    lastName: 'Kiatmoo3',
-    registration: new Date('2017-01-20'),
-    assurance: true,
-    lastPaid: new Date('2017-03-20'),
-    belt: 'black',
-  },
-  {
-    firstName: 'blaaaaaa',
-    lastName: 'Kiatmoo3',
-    registration: new Date('2017-01-20'),
-    assurance: true,
-    lastPaid: new Date('2017-03-20'),
-    belt: 'black',
-  },
-  {
-    firstName: 'blaaaaaa',
-    lastName: 'Kiatmoo3',
-    registration: new Date('2017-01-20'),
-    assurance: true,
-    lastPaid: new Date('2017-03-20'),
-    belt: 'black',
-  },
-  {
-    firstName: 'blaaaaaa',
-    lastName: 'Kiatmoo3',
-    registration: new Date('2017-01-20'),
-    assurance: true,
-    lastPaid: new Date('2017-03-20'),
-    belt: 'black',
-  },
-  {
-    firstName: 'blaaaaaa',
-    lastName: 'Kiatmoo3',
-    registration: new Date('2017-01-20'),
-    assurance: true,
-    lastPaid: new Date('2017-03-20'),
-    belt: 'black',
-  },
-  {
-    firstName: 'blaaaaaa',
-    lastName: 'Kiatmoo3',
-    registration: new Date('2017-01-20'),
-    assurance: true,
-    lastPaid: new Date('2017-03-20'),
-    belt: 'black',
-  },
-]
+function Alert({ children, type, show }) {
+  return (
+    <div className={`alert alert-${type || 'primary'} alert-dismissible fade position-fixed bottom-0 ${show ? 'show' : ''}`} role="alert">
+      {children}
+      <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  );
+}
 
-function UserCreateModal() {
+function UserCreateModal({ alertMessage }) {
   const formRef = useRef();
 
   useEffect(() => {
@@ -185,16 +52,14 @@ function UserCreateModal() {
       body: JSON.stringify(obj),
     }).then((res) => {
       if (res.ok) {
-        // alert('Success: ', res.body);
+        res.text().then((body) => alertMessage('Success: ' + body, 'primary'))
         formRef.current.reset();
       } else {
-        alert('Error: could not connect to backend');
+        alertMessage('Error: ' + res.body, 'danger');
       }
     }).catch((err) => {
-      alert('Error: ', err.message);
+      alertMessage('Error: ' + err.message, 'danger');
     });
-
-    alert(JSON.stringify(obj).replace(',', '\n'));
   };
 
   return (
@@ -235,7 +100,7 @@ function UserCreateModal() {
   );
 }
 
-function UserInfoModal({ user }) {
+function UserInfoModal({ user, alertMessage }) {
   const [edit, setEdit] = useState(false);
   const formRef = useRef();
 
@@ -257,12 +122,12 @@ function UserInfoModal({ user }) {
         body: JSON.stringify(obj),
       }).then((res) => {
         if (res.ok) {
-          // alert('Success: ', res.body);
+          res.text().then((body) => alertMessage('Success: ' + body, 'success'))
         } else {
-          res.text().then((body) => alert('Error: ' + body))
+          res.text().then((body) => alertMessage('Error: ' + body, 'danger'))
         }
       }).catch((err) => {
-        alert('Error: ', err.message);
+        alertMessage('Error: ' + err.message, 'danger');
       });
     }
     setEdit((val) => !val);
@@ -272,12 +137,12 @@ function UserInfoModal({ user }) {
     fetch(`/pay-month/${user.id}`, { method: 'PUT' })
       .then((res) => {
         if (res.ok) {
-          // alert('Success: ', res.body);
+          res.text().then((body) => alertMessage('Success: ' + body, 'success'))
         } else {
-          res.text().then((body) => alert('Error: ' + body))
+          res.text().then((body) => alertMessage('Error: ' + body, 'danger'))
         }
       }).catch((err) => {
-        alert('Error: ', err.message);
+        alertMessage('Error: ' + err.message, 'danger');
       });
   };
 
@@ -286,13 +151,12 @@ function UserInfoModal({ user }) {
       method: 'DELETE'
     }).then((res) => {
       if (res.ok) {
-        // alert('Success: ', res.body);
-        // formRef.current.reset();
+        res.text().then((body) => alertMessage('Success: ' + body, 'success'))
       } else {
-        res.text().then((body) => alert('Error: ' + body))
+        res.text().then((body) => alertMessage('Error: ' + body, 'danger'))
       }
     }).catch((err) => {
-      alert('Error: ', err.message);
+      alertMessage('Error: ' + err.message, 'danger');
     });
     setEdit(false);
   };
@@ -335,6 +199,15 @@ function UserInfoModal({ user }) {
                   <input id='assuranceInput' className='form-check-input' name='assurance' type='checkbox' defaultChecked={user.assurance} disabled={!edit} />
                   <label className='ms-auto form-check-label' htmlFor='assuranceInput'>Assurance</label>
                 </div>
+                <div className='d-flex flex-row'>
+                  <label className='d-inline w-50'>Payment</label>
+                  <span className='text-center d-inline w-50 fw-bolder fs-5'>
+                    {user.debt < 0
+                      ? <FontAwesomeIcon className='me-2' size='xl' color='#CF0000' icon={faAngleDown} />
+                      : <FontAwesomeIcon className='me-2' size='xl' color='#7DCE13' icon={user.debt == 0 ? faCheck : faAngleUp} />}
+                    {user.debt == 0 ? '' : `${Math.abs(user.debt)} Months`}
+                  </span>
+                </div>
                 <label className='form-check-label' htmlFor='registerInput'>Registration Date</label>
                 <input className='form-control' id='registerInput' name='registration' type='date' defaultValue={user.registration?.toISOString().split('T')[0]} disabled={!edit} />
                 <label>Phone Number</label>
@@ -351,7 +224,7 @@ function UserInfoModal({ user }) {
               <botton className='btn btn-danger me-auto' data-bs-toggle='modal' data-bs-target='#confirm-modal'>
                 <FontAwesomeIcon icon={faTrash} />
               </botton>
-              <button type='button' onClick={toggleEdit} className='btn btn-primary'>
+              <button type='button' onClick={toggleEdit} className='btn btn-primary' data-bs-dismiss={edit && 'modal'}>
                 {edit
                   ? <FontAwesomeIcon className='me-2' icon={faCheck} />
                   : <FontAwesomeIcon className='me-2' icon={faPen} />
@@ -361,7 +234,7 @@ function UserInfoModal({ user }) {
                   : 'Edit user'
                 }
               </button>
-              <botton className='btn btn-primary' onClick={payMonth}>
+              <botton className='btn btn-primary' onClick={payMonth} data-bs-dismiss='modal'>
                 <FontAwesomeIcon className='me-2' icon={faCoins} />
                 {'Pay Month'}
               </botton>
@@ -376,7 +249,13 @@ function UserInfoModal({ user }) {
 
 function App() {
   const [users, setUsers] = useState();
-  const [currentUser, setCurrentUser] = useState(data);
+  const [currentUser, setCurrentUser] = useState();
+  const [alerted, setAlerted] = useState(false);
+
+  const alertMessage = (message, type) => {
+    setAlerted({ message, type });
+    setTimeout(() => setAlerted(false), 4000);
+  };
 
   useEffect(() => {
     fetch('/get-all')
@@ -391,14 +270,18 @@ function App() {
         }
         setUsers(res);
       })
-      .catch((err) => alert('Error: ' + err.message));
-    setTimeout(1000, () => alert(JSON.stringify(users)))
+      .catch((err) => alertMessage('Error: ' + err.message, 'danger'));
   });
 
   return (
     <div className='d-flex flex-column align-items-center'>
-      <UserCreateModal />
-      <UserInfoModal user={currentUser} />
+      {alerted &&
+        <Alert type={alerted.type} show={Boolean(alerted)}>
+          {alerted.message}
+        </Alert>
+      }
+      <UserCreateModal alertMessage={alertMessage} />
+      {currentUser && <UserInfoModal user={currentUser} alertMessage={alertMessage} />}
       <img className='w-25' src='/logo.png' />
       <button className='btn btn-secondary position-fixed bottom-0 end-0 rounded-circle m-2' style={{ aspectRatio: '1/1' }} type='button' data-bs-toggle='modal' data-bs-target='#create-modal'>
         <FontAwesomeIcon size='xl' icon={faUserPlus} />
@@ -429,7 +312,7 @@ function App() {
                   : <FontAwesomeIcon className='me-2' size='xl' color='#7DCE13' icon={user.debt == 0 ? faCheck : faAngleUp} />}
                 {user.debt == 0 ? '' : Math.abs(user.debt)}
               </td>
-              <td className='text-center'>{user.registration.toDateString('ar')}</td>
+              <td className='text-center'>{user.registration.toDateString()}</td>
               <td className='text-center'>{
                 user.assurance
                   ? <FontAwesomeIcon size='xl' color='#7DCE13' icon={faCheck} />
@@ -442,9 +325,6 @@ function App() {
           ))}
         </tbody>
       </table>
-
-      {/* <input type='button' onClick={() => {dialog.showOpenDialog({properties: 'openFile'})}} /> */}
-      {/* <h1 className='w-100 h-100 position-absolute top-50 start-50 translate-middle'>Hiiii</h1> */}
     </div>
   )
 }

@@ -2,7 +2,7 @@
   "name": "noor-amal-club",
   "author": "Blxee",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Noor Amal club for Kickboxing and Taekwondo",
   "license": "ISC",
   "main": "electron-main.cjs",
