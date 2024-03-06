@@ -2,7 +2,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 import 'bootstrap/dist/js/bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBacon, faCheck, faCircleUser, faCoins, faMoneyBill, faMoneyBillWave, faMoneyBills, faPen, faPlus, faTrash, faX } from '@fortawesome/free-solid-svg-icons';
+import { faAngleDown, faAngleUp, faBacon, faCheck, faCheckCircle, faCircleUser, faCoins, faMoneyBill, faMoneyBillWave, faMoneyBills, faPen, faPlus, faTrash, faUserPlus, faX, faXmarkCircle } from '@fortawesome/free-solid-svg-icons';
 import './App.css';
 import { useEffect, useRef, useState } from 'react';
 
@@ -21,6 +21,7 @@ const data = [
     registration: new Date('2017-01-20'),
     assurance: true,
     lastPaid: new Date('2017-03-20'),
+    debt: 3,
     belt: 'black',
   },
   {
@@ -28,6 +29,7 @@ const data = [
     lastName: 'Kiatmoo3',
     registration: new Date('2017-01-20'),
     assurance: true,
+    debt: 0,
     lastPaid: new Date('2017-03-20'),
     belt: 'black',
   },
@@ -36,6 +38,7 @@ const data = [
     lastName: 'Kiatmoo3',
     registration: new Date('2017-01-20'),
     assurance: true,
+    debt: -2,
     lastPaid: new Date('2017-03-20'),
     belt: 'black',
   },
@@ -224,7 +227,7 @@ function UserCreateModal() {
           </div>
           <div className='modal-footer'>
             <button type='button' className='btn btn-secondary' data-bs-dismiss='modal'>Close</button>
-            <button type='button' className='btn btn-primary' onClick={createUser}>Create User</button>
+            <button type='button' className='btn btn-primary' onClick={createUser} data-bs-dismiss='modal'>Create User</button>
           </div>
         </div>
       </div>
@@ -246,7 +249,7 @@ function UserInfoModal({ user }) {
         obj[key] = val;
       });
       delete obj.lastPaid;
-      obj.assurance = obj.assurance == undefined;
+      obj.assurance = obj.assurance != undefined;
 
       fetch(`/update-user/${user.id}`, {
         method: 'PUT',
@@ -255,9 +258,8 @@ function UserInfoModal({ user }) {
       }).then((res) => {
         if (res.ok) {
           // alert('Success: ', res.body);
-          this.forceUpdate();
         } else {
-          alert('Error: could not connect to backend');
+          res.text().then((body) => alert('Error: ' + body))
         }
       }).catch((err) => {
         alert('Error: ', err.message);
@@ -267,11 +269,10 @@ function UserInfoModal({ user }) {
   };
 
   const payMonth = () => {
-    fetch(`/pay-month/${user.id}`, {method: 'PUT'})
+    fetch(`/pay-month/${user.id}`, { method: 'PUT' })
       .then((res) => {
         if (res.ok) {
           // alert('Success: ', res.body);
-          this.forceUpdate();
         } else {
           res.text().then((body) => alert('Error: ' + body))
         }
@@ -297,60 +298,79 @@ function UserInfoModal({ user }) {
   };
 
   return (
-    <div className='modal fade' id='user-modal' tabIndex='-1' aria-labelledby='modalLabel' aria-hidden='true'>
-      <div className='modal-dialog'>
-        <div className='modal-content'>
-          <div className='modal-header'>
-            <h1 className='modal-title fs-5' id='modalLabel'>{user.firstName} {user.lastName}</h1>
-            <button type='button' className='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
-          </div>
-          <div className='modal-body'>
-            <form ref={formRef} id='updateForm' className='w-100 d-flex flex-column gap-3'>
-              <div>
-                <label className='w-50'>First Name</label>
-                <label className='w-50'>Last Name</label>
-                <input className='w-50 d-inline form-control' type='text' name='firstName' defaultValue={user.firstName} disabled={!edit} />
-                <input className='w-50 d-inline form-control' type='text' name='lastName' defaultValue={user.lastName} disabled={!edit} />
-              </div>
-              <div className='input-group d-flex flex-row'>
-                <input id='assuranceInput' className='form-check-input' name='assurance' type='checkbox' defaultChecked={user.assurance} disabled={!edit} />
-                <label className='ms-auto form-check-label' htmlFor='assuranceInput'>Assurance</label>
-              </div>
-              <label className='form-check-label' htmlFor='registerInput'>Registration Date</label>
-              <input className='form-control' id='registerInput' name='registration' type='date' defaultValue={user.registration?.toISOString().split('T')[0]} disabled={!edit} />
-              <label>Phone Number</label>
-              <input className='form-control' name='phoneNumber' type='tel' defaultValue={user.phoneNumber} disabled={!edit} />
-              <label>Belt</label>
-              <select className='form-select' name='belt' disabled={!edit}>
-                {Object.entries(belts).map(([key, val]) =>
-                  <option key={key} style={{ color: val }} value={key} selected={key === user.belt}>{key}</option>
-                )}
-              </select>
-            </form>
-          </div>
-          <div className='modal-footer'>
-            <botton className='btn btn-danger me-auto' onClick={deleteUser}>
-              <FontAwesomeIcon icon={faTrash} />
-            </botton>
-            <button type='button' onClick={toggleEdit} className='btn btn-primary'>
-              {edit
-                ? <FontAwesomeIcon className='me-2' icon={faCheck} />
-                : <FontAwesomeIcon className='me-2' icon={faPen} />
-              }
-              {edit
-                ? 'Save changes'
-                : 'Edit user'
-              }
-            </button>
-            <botton className='btn btn-primary' onClick={payMonth}>
-              <FontAwesomeIcon className='me-2' icon={faCoins} />
-              {'Pay Month'}
-            </botton>
-            <button type='button' className='btn btn-secondary' onClick={() => setEdit(false)} data-bs-dismiss='modal'>Close</button>
+    <>
+      <div className='modal fade' id='confirm-modal' tabIndex='-1' aria-labelledby='modalLabel' aria-hidden='true'>
+        <div className='modal-dialog'>
+          <div className='modal-content'>
+            <div className='modal-header'>
+              <h1 className='modal-title fs-5' id='modalLabel'>Are you sure?</h1>
+              <button type='button' className='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
+            </div>
+            <div className='modal-body'>
+              You are about to <span className='text-danger'>delete</span> the user <b>{user.firstName} {user.lastName}</b>
+            </div>
+            <div className='modal-footer'>
+              <botton className='btn btn-danger me-auto' onClick={deleteUser} data-bs-dismiss='modal'>Yes</botton>
+              <button type='button' className='btn btn-secondary' onClick={() => setEdit(false)} data-bs-dismiss='modal'>No</button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+      <div className='modal fade' id='user-modal' tabIndex='-1' aria-labelledby='modalLabel' aria-hidden='true'>
+        <div className='modal-dialog'>
+          <div className='modal-content'>
+            <div className='modal-header'>
+              <h1 className='modal-title fs-5' id='modalLabel'>{user.firstName} {user.lastName}</h1>
+              <button type='button' className='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
+            </div>
+            <div className='modal-body'>
+              <form ref={formRef} id='updateForm' className='w-100 d-flex flex-column gap-3'>
+                <div>
+                  <label className='w-50'>First Name</label>
+                  <label className='w-50'>Last Name</label>
+                  <input className='w-50 d-inline form-control' type='text' name='firstName' defaultValue={user.firstName} disabled={!edit} />
+                  <input className='w-50 d-inline form-control' type='text' name='lastName' defaultValue={user.lastName} disabled={!edit} />
+                </div>
+                <div className='input-group d-flex flex-row'>
+                  <input id='assuranceInput' className='form-check-input' name='assurance' type='checkbox' defaultChecked={user.assurance} disabled={!edit} />
+                  <label className='ms-auto form-check-label' htmlFor='assuranceInput'>Assurance</label>
+                </div>
+                <label className='form-check-label' htmlFor='registerInput'>Registration Date</label>
+                <input className='form-control' id='registerInput' name='registration' type='date' defaultValue={user.registration?.toISOString().split('T')[0]} disabled={!edit} />
+                <label>Phone Number</label>
+                <input className='form-control' name='phoneNumber' type='tel' defaultValue={user.phoneNumber} disabled={!edit} />
+                <label>Belt</label>
+                <select className='form-select' name='belt' disabled={!edit}>
+                  {Object.entries(belts).map(([key, val]) =>
+                    <option key={key} style={{ color: val }} value={key} selected={key === user.belt}>{key}</option>
+                  )}
+                </select>
+              </form>
+            </div>
+            <div className='modal-footer'>
+              <botton className='btn btn-danger me-auto' data-bs-toggle='modal' data-bs-target='#confirm-modal'>
+                <FontAwesomeIcon icon={faTrash} />
+              </botton>
+              <button type='button' onClick={toggleEdit} className='btn btn-primary'>
+                {edit
+                  ? <FontAwesomeIcon className='me-2' icon={faCheck} />
+                  : <FontAwesomeIcon className='me-2' icon={faPen} />
+                }
+                {edit
+                  ? 'Save changes'
+                  : 'Edit user'
+                }
+              </button>
+              <botton className='btn btn-primary' onClick={payMonth}>
+                <FontAwesomeIcon className='me-2' icon={faCoins} />
+                {'Pay Month'}
+              </botton>
+              <button type='button' className='btn btn-secondary' onClick={() => setEdit(false)} data-bs-dismiss='modal'>Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   )
 }
 
@@ -365,6 +385,9 @@ function App() {
         for (const user of res) {
           user.registration = new Date(user.registration);
           user.lastPaid = new Date(user.lastPaid);
+          const currentDate = new Date();
+          user.debt = (user.lastPaid.getFullYear() * 12 + user.lastPaid.getMonth())
+            - (currentDate.getFullYear() * 12 + currentDate.getMonth());
         }
         setUsers(res);
       })
@@ -377,8 +400,8 @@ function App() {
       <UserCreateModal />
       <UserInfoModal user={currentUser} />
       <img className='w-25' src='/logo.png' />
-      <button className='btn btn-secondary position-fixed bottom-0 end-0 rounded-circle m-2' type='button' data-bs-toggle='modal' data-bs-target='#create-modal'>
-        <FontAwesomeIcon size='2x' icon={faPlus} />
+      <button className='btn btn-secondary position-fixed bottom-0 end-0 rounded-circle m-2' style={{ aspectRatio: '1/1' }} type='button' data-bs-toggle='modal' data-bs-target='#create-modal'>
+        <FontAwesomeIcon size='xl' icon={faUserPlus} />
       </button>
       <table style={{ marginBottom: '5rem' }} className='table table-striped container-fluid'>
         <thead>
@@ -400,10 +423,13 @@ function App() {
               </td>
               <td className='text-center'>{user.firstName}</td>
               <td className='text-center'>{user.lastName}</td>
-              <td className='text-center'>{
-                (user.registration.getFullYear() * 12 + user.registration.getMonth()) - (user.lastPaid.getFullYear() * 12 + user.lastPaid.getMonth())
-              }</td>
-              <td className='text-center'>{user.registration.toDateString()}</td>
+              <td className='text-center fw-bolder fs-5'>
+                {user.debt < 0
+                  ? <FontAwesomeIcon className='me-2' size='xl' color='#CF0000' icon={faAngleDown} />
+                  : <FontAwesomeIcon className='me-2' size='xl' color='#7DCE13' icon={user.debt == 0 ? faCheck : faAngleUp} />}
+                {user.debt == 0 ? '' : Math.abs(user.debt)}
+              </td>
+              <td className='text-center'>{user.registration.toDateString('ar')}</td>
               <td className='text-center'>{
                 user.assurance
                   ? <FontAwesomeIcon size='xl' color='#7DCE13' icon={faCheck} />
