@@ -38,10 +38,10 @@ const startDataAPI = () => {
       data.push(newUser);
       data = JSON.stringify(data);
       fs.writeFileSync(dataPath, data);
-      res.status(200).send('User added successfully');
+      res.status(200).send('تمت اضافة عضو جديد بنجاح');
     } catch (error) {
       console.log(error);
-      res.status(404).send('Failed to add user');
+      res.status(404).send('فشل اضافة عضو جديد');
     }
     res.end();
   });
@@ -53,13 +53,13 @@ const startDataAPI = () => {
       data = JSON.parse(data);
       const user = data.find(({ id }) => id === parseInt(req.params.userId));
       if (user == undefined) {
-        res.status(404).send('No such user exists');
+        res.status(404).send('لا يمكن ايجاد هذا العضو');
         return;
       }
       Object.assign(user, updatedUser);
       data = JSON.stringify(data);
       fs.writeFileSync(dataPath, data);
-      res.status(200).send('User updated successfully');
+      res.status(200).send('تم تعديل معلومات العضو بنجاح');
     } catch (error) {
       console.log(error);
       res.status(404).send(error.message);
@@ -73,7 +73,7 @@ const startDataAPI = () => {
       data = JSON.parse(data);
       const user = data.find(({ id }) => id === parseInt(req.params.userId));
       if (user == undefined) {
-        res.status(404).send('No such user exists');
+        res.status(404).send('لا يمكن ايجاد هذا العضو');
         return;
       }
       let lastPaid = new Date(user.lastPaid);
@@ -81,7 +81,7 @@ const startDataAPI = () => {
       user.lastPaid = lastPaid;
       data = JSON.stringify(data);
       fs.writeFileSync(dataPath, data);
-      res.status(200).send('User payment updated successfully');
+      res.status(200).send('تم دفع شهر لهذا العضو');
     } catch (error) {
       console.log(error);
       res.status(404).send(error.message);
@@ -95,16 +95,16 @@ const startDataAPI = () => {
       data = JSON.parse(data);
       const idx = data.findIndex(({ id }) => id === parseInt(req.params.userId));
       if (idx === -1) {
-        res.status(404).send('No such user exists');
+        res.status(404).send('لا يمكن ايجاد هذا العضو');
         return;
       }
       const user = data.splice(idx, 1);
       data = JSON.stringify(data);
       fs.writeFileSync(dataPath, data);
-      res.status(200).send('User deleted successfully');
+      res.status(200).send('تم حذف هذا العضو بنجاح');
     } catch (error) {
       console.log(error);
-      res.status(404).send('Error: ' + error.message);
+      res.status(404).send(error.message);
     }
     res.end();
   });

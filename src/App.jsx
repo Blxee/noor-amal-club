@@ -14,6 +14,14 @@ const belts = {
   black: '#000000',
 };
 
+const belts_ar = {
+  white: 'أبيض',
+  green: 'أخضر',
+  blue: 'أزرق',
+  brown: 'بني',
+  black: 'أسود',
+};
+
 function Alert({ children, type, show }) {
   return (
     <div className={`alert alert-${type || 'primary'} alert-dismissible fade position-fixed bottom-0 ${show ? 'show' : ''}`} role="alert">
@@ -52,13 +60,13 @@ function UserCreateModal({ alertMessage }) {
       body: JSON.stringify(obj),
     }).then((res) => {
       if (res.ok) {
-        res.text().then((body) => alertMessage('Success: ' + body, 'primary'))
+        res.text().then((body) => alertMessage('نجاح: ' + body, 'primary'))
         formRef.current.reset();
       } else {
-        alertMessage('Error: ' + res.body, 'danger');
+        alertMessage('خطأ: ' + res.body, 'danger');
       }
     }).catch((err) => {
-      alertMessage('Error: ' + err.message, 'danger');
+      alertMessage('خطأ: ' + err.message, 'danger');
     });
   };
 
@@ -67,32 +75,32 @@ function UserCreateModal({ alertMessage }) {
       <div className='modal-dialog'>
         <div className='modal-content'>
           <div className='modal-header'>
-            <h1 className='modal-title fs-5' id='modalLabel'>Modal title</h1>
+            <h1 className='modal-title fs-5' id='modalLabel'>عضو جديد</h1>
             <button type='button' className='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
           </div>
           <div className='modal-body'>
             <form ref={formRef} id='creationForm' className='w-100 d-flex flex-column gap-3'>
-              <input className='form-control' name='firstName' type='text' placeholder='First Name' required />
-              <input className='form-control' name='lastName' type='text' placeholder='Last Name' required />
+              <input className='form-control' name='firstName' type='text' placeholder='الإسم الشخصي' required />
+              <input className='form-control' name='lastName' type='text' placeholder='الإسم العائلي' required />
               <div className='input-group d-flex flex-row'>
                 <input id='assuranceInput' className='form-check-input' name='assurance' type='checkbox' value='true' />
-                <label className='ms-auto form-check-label' htmlFor='assuranceInput'>Assurance</label>
+                <label className='ms-auto form-check-label' htmlFor='assuranceInput'>التأمين</label>
               </div>
-              <label className='form-check-label' htmlFor='registerInput'>Registration Date</label>
+              <label className='form-check-label' htmlFor='registerInput'>تاريخ التسجيل</label>
               <input className='form-control' id='registerInput' name='registration' type='date' />
-              <label>Phone Number</label>
+              <label>رقم الهاتف</label>
               <input className='form-control' name='phoneNumber' type='tel' />
-              <label>Belt</label>
+              <label>الحزام</label>
               <select className='form-select' name='belt'>
                 {Object.entries(belts).map(([key, val]) =>
-                  <option key={key} style={{ color: val }} value={key} selected={key === 'white'}>{key}</option>
+                  <option key={key} style={{ color: val }} value={key} selected={key === 'white'}>{belts_ar[key]}</option>
                 )}
               </select>
             </form>
           </div>
           <div className='modal-footer'>
-            <button type='button' className='btn btn-secondary' data-bs-dismiss='modal'>Close</button>
-            <button type='button' className='btn btn-primary' onClick={createUser} data-bs-dismiss='modal'>Create User</button>
+            <button type='button' className='btn btn-secondary' data-bs-dismiss='modal'>إلغاء</button>
+            <button type='button' className='btn btn-primary' onClick={createUser} data-bs-dismiss='modal'>إضافة عضو</button>
           </div>
         </div>
       </div>
@@ -122,12 +130,12 @@ function UserInfoModal({ user, alertMessage }) {
         body: JSON.stringify(obj),
       }).then((res) => {
         if (res.ok) {
-          res.text().then((body) => alertMessage('Success: ' + body, 'success'))
+          res.text().then((body) => alertMessage('نجاح: ' + body, 'success'))
         } else {
-          res.text().then((body) => alertMessage('Error: ' + body, 'danger'))
+          res.text().then((body) => alertMessage('خطأ: ' + body, 'danger'))
         }
       }).catch((err) => {
-        alertMessage('Error: ' + err.message, 'danger');
+        alertMessage('خطأ: ' + err.message, 'danger');
       });
     }
     setEdit((val) => !val);
@@ -137,12 +145,12 @@ function UserInfoModal({ user, alertMessage }) {
     fetch(`/pay-month/${user.id}`, { method: 'PUT' })
       .then((res) => {
         if (res.ok) {
-          res.text().then((body) => alertMessage('Success: ' + body, 'success'))
+          res.text().then((body) => alertMessage('نجاح: ' + body, 'success'))
         } else {
-          res.text().then((body) => alertMessage('Error: ' + body, 'danger'))
+          res.text().then((body) => alertMessage('خطأ: ' + body, 'danger'))
         }
       }).catch((err) => {
-        alertMessage('Error: ' + err.message, 'danger');
+        alertMessage('خطأ: ' + err.message, 'danger');
       });
   };
 
@@ -151,12 +159,12 @@ function UserInfoModal({ user, alertMessage }) {
       method: 'DELETE'
     }).then((res) => {
       if (res.ok) {
-        res.text().then((body) => alertMessage('Success: ' + body, 'success'))
+        res.text().then((body) => alertMessage('نجاح: ' + body, 'success'))
       } else {
-        res.text().then((body) => alertMessage('Error: ' + body, 'danger'))
+        res.text().then((body) => alertMessage('خطأ: ' + body, 'danger'))
       }
     }).catch((err) => {
-      alertMessage('Error: ' + err.message, 'danger');
+      alertMessage('خطأ: ' + err.message, 'danger');
     });
     setEdit(false);
   };
@@ -167,15 +175,15 @@ function UserInfoModal({ user, alertMessage }) {
         <div className='modal-dialog'>
           <div className='modal-content'>
             <div className='modal-header'>
-              <h1 className='modal-title fs-5' id='modalLabel'>Are you sure?</h1>
+              <h1 className='modal-title fs-5' id='modalLabel'>هل أنت متأكظ؟</h1>
               <button type='button' className='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
             </div>
             <div className='modal-body'>
-              You are about to <span className='text-danger'>delete</span> the user <b>{user.firstName} {user.lastName}</b>
+              أنت على وشك <span className='text-danger'>حذف</span> العضو <b>{user.firstName} {user.lastName}</b>
             </div>
             <div className='modal-footer'>
-              <botton className='btn btn-danger me-auto' onClick={deleteUser} data-bs-dismiss='modal'>Yes</botton>
-              <button type='button' className='btn btn-secondary' onClick={() => setEdit(false)} data-bs-dismiss='modal'>No</button>
+              <botton className='btn btn-danger me-auto' onClick={deleteUser} data-bs-dismiss='modal'>نعم</botton>
+              <button type='button' className='btn btn-secondary' onClick={() => setEdit(false)} data-bs-dismiss='modal'>لا</button>
             </div>
           </div>
         </div>
@@ -190,32 +198,32 @@ function UserInfoModal({ user, alertMessage }) {
             <div className='modal-body'>
               <form ref={formRef} id='updateForm' className='w-100 d-flex flex-column gap-3'>
                 <div>
-                  <label className='w-50'>First Name</label>
-                  <label className='w-50'>Last Name</label>
+                  <label className='w-50'>الإسم الشخصي</label>
+                  <label className='w-50'>الإسم العائلي</label>
                   <input className='w-50 d-inline form-control' type='text' name='firstName' defaultValue={user.firstName} disabled={!edit} />
                   <input className='w-50 d-inline form-control' type='text' name='lastName' defaultValue={user.lastName} disabled={!edit} />
                 </div>
-                <div className='input-group d-flex flex-row'>
+                <div className='input-group d-flex flex-row border rounded p-2'>
                   <input id='assuranceInput' className='form-check-input' name='assurance' type='checkbox' defaultChecked={user.assurance} disabled={!edit} />
-                  <label className='ms-auto form-check-label' htmlFor='assuranceInput'>Assurance</label>
+                  <label className='ms-auto form-check-label' htmlFor='assuranceInput'>التأمين</label>
                 </div>
-                <div className='d-flex flex-row'>
-                  <label className='d-inline w-50'>Payment</label>
+                <div className='d-flex flex-row border rounded p-2'>
+                  <label className='d-inline w-50'>الواجب الشهري</label>
                   <span className='text-center d-inline w-50 fw-bolder fs-5'>
                     {user.debt < 0
                       ? <FontAwesomeIcon className='me-2' size='xl' color='#CF0000' icon={faAngleDown} />
                       : <FontAwesomeIcon className='me-2' size='xl' color='#7DCE13' icon={user.debt == 0 ? faCheck : faAngleUp} />}
-                    {user.debt == 0 ? '' : `${Math.abs(user.debt)} Months`}
+                    {user.debt == 0 ? '' : `${Math.abs(user.debt)} أشهر`}
                   </span>
                 </div>
-                <label className='form-check-label' htmlFor='registerInput'>Registration Date</label>
+                <label className='form-check-label' htmlFor='registerInput'>تاريخ التسجيل</label>
                 <input className='form-control' id='registerInput' name='registration' type='date' defaultValue={user.registration?.toISOString().split('T')[0]} disabled={!edit} />
-                <label>Phone Number</label>
+                <label>رقم الهاتف</label>
                 <input className='form-control' name='phoneNumber' type='tel' defaultValue={user.phoneNumber} disabled={!edit} />
-                <label>Belt</label>
+                <label>الحزام</label>
                 <select className='form-select' name='belt' disabled={!edit}>
                   {Object.entries(belts).map(([key, val]) =>
-                    <option key={key} style={{ color: val }} value={key} selected={key === user.belt}>{key}</option>
+                    <option key={key} style={{ color: val }} value={key} selected={key === user.belt}>{belts_ar[key]}</option>
                   )}
                 </select>
               </form>
@@ -230,15 +238,15 @@ function UserInfoModal({ user, alertMessage }) {
                   : <FontAwesomeIcon className='me-2' icon={faPen} />
                 }
                 {edit
-                  ? 'Save changes'
-                  : 'Edit user'
+                  ? 'حفظ'
+                  : 'تعديل'
                 }
               </button>
               <botton className='btn btn-primary' onClick={payMonth} data-bs-dismiss='modal'>
                 <FontAwesomeIcon className='me-2' icon={faCoins} />
-                {'Pay Month'}
+                {'دفع الواجب الشهري'}
               </botton>
-              <button type='button' className='btn btn-secondary' onClick={() => setEdit(false)} data-bs-dismiss='modal'>Close</button>
+              <button type='button' className='btn btn-secondary' onClick={() => setEdit(false)} data-bs-dismiss='modal'>إغلاق</button>
             </div>
           </div>
         </div>
@@ -270,7 +278,7 @@ function App() {
         }
         setUsers(res);
       })
-      .catch((err) => alertMessage('Error: ' + err.message, 'danger'));
+      .catch((err) => alertMessage('خطأ: ' + err.message, 'danger'));
   });
 
   return (
@@ -289,13 +297,14 @@ function App() {
       <table style={{ marginBottom: '5rem' }} className='table table-striped container-fluid'>
         <thead>
           <tr>
-            <th scope='col' className='text-center'>Profile</th>
-            <th scope='col' className='text-center'>First Name</th>
-            <th scope='col' className='text-center'>Last Name</th>
-            <th scope='col' className='text-center'>Payment</th>
-            <th scope='col' className='text-center'>Registration</th>
-            <th scope='col' className='text-center'>Assurance</th>
-            <th scope='col' className='text-center' style={{ width: '5%', textAlign: 'center', }}>Belt</th>
+            <th scope='col' className='text-center'>الصورة</th>
+            <th scope='col' className='text-center'>الإسم الشخصي</th>
+            <th scope='col' className='text-center'>الإسم العائلي</th>
+            <th scope='col' className='text-center'>الواجب الشهري</th>
+            <th scope='col' className='text-center'>تاريخ التسجيل</th>
+            <th scope='col' className='text-center'>رقم الهاتف</th>
+            <th scope='col' className='text-center'>التأمين</th>
+            <th scope='col' className='text-center' style={{ width: '5%', textAlign: 'center', }}>الحزام</th>
           </tr>
         </thead>
         <tbody>
@@ -313,6 +322,7 @@ function App() {
                 {user.debt == 0 ? '' : Math.abs(user.debt)}
               </td>
               <td className='text-center'>{user.registration.toDateString()}</td>
+              <td className='text-center'>{user.phoneNumber}</td>
               <td className='text-center'>{
                 user.assurance
                   ? <FontAwesomeIcon size='xl' color='#7DCE13' icon={faCheck} />
