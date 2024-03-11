@@ -1,5 +1,4 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-
 import 'bootstrap/dist/js/bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleDown, faAngleUp, faBacon, faCheck, faCheckCircle, faCircleUser, faCoins, faMoneyBill, faMoneyBillWave, faMoneyBills, faPen, faPlus, faTrash, faUserPlus, faX, faXmarkCircle } from '@fortawesome/free-solid-svg-icons';
@@ -54,20 +53,13 @@ function UserCreateModal({ alertMessage }) {
     if (obj.assurance)
       obj.assurance = true;
 
-    fetch('/add-user', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(obj),
-    }).then((res) => {
-      if (res.ok) {
-        res.text().then((body) => alertMessage('نجاح: ' + body, 'primary'))
-        formRef.current.reset();
-      } else {
-        alertMessage('خطأ: ' + res.body, 'danger');
-      }
-    }).catch((err) => {
-      alertMessage('خطأ: ' + err.message, 'danger');
-    });
+    const [res, msg] = getAll(obj);
+    if (res === 'success') {
+      alertMessage('نجاح: ' + msg, 'primary');
+      formRef.current.reset();
+    } else {
+      alertMessage('خطأ: ' + msg, 'danger');
+    }
   };
 
   return (
@@ -124,48 +116,32 @@ function UserInfoModal({ user, alertMessage }) {
       delete obj.lastPaid;
       obj.assurance = obj.assurance != undefined;
 
-      fetch(`/update-user/${user.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(obj),
-      }).then((res) => {
-        if (res.ok) {
-          res.text().then((body) => alertMessage('نجاح: ' + body, 'success'))
-        } else {
-          res.text().then((body) => alertMessage('خطأ: ' + body, 'danger'))
-        }
-      }).catch((err) => {
-        alertMessage('خطأ: ' + err.message, 'danger');
-      });
+      const [res, msg] = updateUser(obj);
+      if (res === 'success') {
+        alertMessage('نجاح: ' + msg, 'success');
+      } else {
+        alertMessage('خطأ: ' + msg, 'danger');
+      }
     }
     setEdit((val) => !val);
   };
 
   const payMonth = () => {
-    fetch(`/pay-month/${user.id}`, { method: 'PUT' })
-      .then((res) => {
-        if (res.ok) {
-          res.text().then((body) => alertMessage('نجاح: ' + body, 'success'))
-        } else {
-          res.text().then((body) => alertMessage('خطأ: ' + body, 'danger'))
-        }
-      }).catch((err) => {
-        alertMessage('خطأ: ' + err.message, 'danger');
-      });
+    const [res, msg] = payMonth(user.id);
+    if (res === 'success') {
+      alertMessage('نجاح: ' + msg, 'success');
+    } else {
+      alertMessage('خطأ: ' + msg, 'danger');
+    }
   };
 
-  const deleteUser = () => {
-    fetch(`/delete-user/${user.id}`, {
-      method: 'DELETE'
-    }).then((res) => {
-      if (res.ok) {
-        res.text().then((body) => alertMessage('نجاح: ' + body, 'success'))
-      } else {
-        res.text().then((body) => alertMessage('خطأ: ' + body, 'danger'))
-      }
-    }).catch((err) => {
-      alertMessage('خطأ: ' + err.message, 'danger');
-    });
+  const userDelete = () => {
+    const [res, msg] = deleteUser(user.id);
+    if (res === 'success') {
+      alertMessage('نجاح: ' + msg, 'success');
+    } else {
+      alertMessage('خطأ: ' + msg, 'danger');
+    }
     setEdit(false);
   };
 
@@ -182,7 +158,7 @@ function UserInfoModal({ user, alertMessage }) {
               أنت على وشك <span className='text-danger'>حذف</span> العضو <b>{user.firstName} {user.lastName}</b>
             </div>
             <div className='modal-footer'>
-              <botton className='btn btn-danger me-auto' onClick={deleteUser} data-bs-dismiss='modal'>نعم</botton>
+              <botton className='btn btn-danger me-auto' onClick={userDelete} data-bs-dismiss='modal'>نعم</botton>
               <button type='button' className='btn btn-secondary' onClick={() => setEdit(false)} data-bs-dismiss='modal'>لا</button>
             </div>
           </div>
@@ -266,19 +242,19 @@ function App() {
   };
 
   useEffect(() => {
-    fetch('/get-all')
-      .then((res) => res.json())
-      .then((res) => {
-        for (const user of res) {
-          user.registration = new Date(user.registration);
-          user.lastPaid = new Date(user.lastPaid);
-          const currentDate = new Date();
-          user.debt = (user.lastPaid.getFullYear() * 12 + user.lastPaid.getMonth())
-            - (currentDate.getFullYear() * 12 + currentDate.getMonth());
-        }
-        setUsers(res);
-      })
-      .catch((err) => alertMessage('خطأ: ' + err.message, 'danger'));
+    const [res, msg] = getAll();
+    if (res === 'success') {
+      for (const user of msg) {
+        user.registration = new Date(user.registration);
+        user.lastPaid = new Date(user.lastPaid);
+        const currentDate = new Date();
+        user.debt = (user.lastPaid.getFullYear() * 12 + user.lastPaid.getMonth())
+          - (currentDate.getFullYear() * 12 + currentDate.getMonth());
+      }
+      setUsers(msg);
+    } else {
+      alertMessage('خطأ: ' + msg, 'danger');
+    }
   });
 
   return (
