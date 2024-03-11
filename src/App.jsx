@@ -5,14 +5,6 @@ import { faAngleDown, faAngleUp, faBacon, faCheck, faCheckCircle, faCircleUser, 
 import './App.css';
 import { useEffect, useRef, useState } from 'react';
 
-const {
-  getAll,
-  addUser,
-  updateUser,
-  payMonth,
-  deleteUser,
-} = window.usersApi;
-
 const belts = {
   white: '#FFFFEC',
   green: '#0D9276',
@@ -61,7 +53,7 @@ function UserCreateModal({ alertMessage }) {
     if (obj.assurance)
       obj.assurance = true;
 
-    const [res, msg] = addUser(obj);
+    const [res, msg] = window.usersAPI.addUser(obj);
     if (res === 'success') {
       alertMessage('نجاح: ' + msg, 'primary');
       formRef.current.reset();
@@ -124,7 +116,7 @@ function UserInfoModal({ user, alertMessage }) {
       delete obj.lastPaid;
       obj.assurance = obj.assurance != undefined;
 
-      const [res, msg] = updateUser(obj);
+      const [res, msg] = window.usersAPI.updateUser(obj);
       if (res === 'success') {
         alertMessage('نجاح: ' + msg, 'success');
       } else {
@@ -135,7 +127,7 @@ function UserInfoModal({ user, alertMessage }) {
   };
 
   const monthPay = () => {
-    const [res, msg] = payMonth(user.id);
+    const [res, msg] = window.usersAPI.payMonth(user.id);
     if (res === 'success') {
       alertMessage('نجاح: ' + msg, 'success');
     } else {
@@ -144,7 +136,7 @@ function UserInfoModal({ user, alertMessage }) {
   };
 
   const userDelete = () => {
-    const [res, msg] = deleteUser(user.id);
+    const [res, msg] = window.usersAPI.deleteUser(user.id);
     if (res === 'success') {
       alertMessage('نجاح: ' + msg, 'success');
     } else {
@@ -250,7 +242,7 @@ function App() {
   };
 
   useEffect(() => {
-    const [res, msg] = getAll();
+    const [res, msg] = window.usersAPI.getAll();
     if (res === 'success') {
       for (const user of msg) {
         user.registration = new Date(user.registration);
