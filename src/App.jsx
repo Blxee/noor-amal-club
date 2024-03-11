@@ -5,6 +5,14 @@ import { faAngleDown, faAngleUp, faBacon, faCheck, faCheckCircle, faCircleUser, 
 import './App.css';
 import { useEffect, useRef, useState } from 'react';
 
+const {
+  getAll,
+  addUser,
+  updateUser,
+  payMonth,
+  deleteUser,
+} = window.usersApi;
+
 const belts = {
   white: '#FFFFEC',
   green: '#0D9276',
@@ -53,7 +61,7 @@ function UserCreateModal({ alertMessage }) {
     if (obj.assurance)
       obj.assurance = true;
 
-    const [res, msg] = getAll(obj);
+    const [res, msg] = addUser(obj);
     if (res === 'success') {
       alertMessage('نجاح: ' + msg, 'primary');
       formRef.current.reset();
@@ -126,7 +134,7 @@ function UserInfoModal({ user, alertMessage }) {
     setEdit((val) => !val);
   };
 
-  const payMonth = () => {
+  const monthPay = () => {
     const [res, msg] = payMonth(user.id);
     if (res === 'success') {
       alertMessage('نجاح: ' + msg, 'success');
@@ -218,7 +226,7 @@ function UserInfoModal({ user, alertMessage }) {
                   : 'تعديل'
                 }
               </button>
-              <botton className='btn btn-primary' onClick={payMonth} data-bs-dismiss='modal'>
+              <botton className='btn btn-primary' onClick={monthPay} data-bs-dismiss='modal'>
                 <FontAwesomeIcon className='me-2' icon={faCoins} />
                 {'دفع الواجب الشهري'}
               </botton>
