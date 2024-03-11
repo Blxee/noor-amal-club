@@ -13,7 +13,13 @@ const createWindow = () => {
     height: 600,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: true,
     },
+  });
+
+  // sent data path to preload
+  mainWindow.webContents.on('did-finish-load', () => {
+    mainWindow.webContents.send('get-data', app.getPath('userData') + '/user-data.json');
   });
 
   // and load the index.html of the app.
