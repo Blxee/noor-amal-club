@@ -94,9 +94,11 @@ ipcRenderer.on('get-data', (event, dataPath) => {
     }
   }
 
-  contextBridge.exposeInMainWorld('getAll', getAll);
-  contextBridge.exposeInMainWorld('addUser', addUser);
-  contextBridge.exposeInMainWorld('updatedUser', updateUser);
-  contextBridge.exposeInMainWorld('payMonth', payMonth);
-  contextBridge.exposeInMainWorld('deleteUser', deleteUser);
+  contextBridge.exposeInMainWorld('usersAPI', {
+    getAll,
+    addUser,
+    updateUser,
+    payMonth,
+    deleteUser,
+  });
 });
