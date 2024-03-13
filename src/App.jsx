@@ -242,19 +242,21 @@ function App() {
   };
 
   useEffect(() => {
-    const [res, msg] = window.usersAPI.getAll();
-    if (res === 'success') {
-      for (const user of msg) {
-        user.registration = new Date(user.registration);
-        user.lastPaid = new Date(user.lastPaid);
-        const currentDate = new Date();
-        user.debt = (user.lastPaid.getFullYear() * 12 + user.lastPaid.getMonth())
-          - (currentDate.getFullYear() * 12 + currentDate.getMonth());
+    setTimeout(() => {
+      const [res, msg] = window.usersAPI.getAll();
+      if (res === 'success') {
+        for (const user of msg) {
+          user.registration = new Date(user.registration);
+          user.lastPaid = new Date(user.lastPaid);
+          const currentDate = new Date();
+          user.debt = (user.lastPaid.getFullYear() * 12 + user.lastPaid.getMonth())
+            - (currentDate.getFullYear() * 12 + currentDate.getMonth());
+        }
+        setUsers(msg);
+      } else {
+        alertMessage('خطأ: ' + msg, 'danger');
       }
-      setUsers(msg);
-    } else {
-      alertMessage('خطأ: ' + msg, 'danger');
-    }
+    }, 3000);
   });
 
   return (
